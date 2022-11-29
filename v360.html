@@ -16,6 +16,7 @@
                 return document.getElementById(e);
             }
             onload = function () {
+                DeviceOrientationEvent.requestPermission();
                 function main(POX) {
                     let src = "sample/R0010392.JPG";
                     let mode = 1;
