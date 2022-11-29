@@ -1,186 +1,257 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width" /> 
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>PolygonExplorerPlayer</title>
-<script src="js/poxp_all.js?20200607" defer></script>
-<script src="js/poxp_view.js?20200607"></script>
-<script>
-function $(e){return document.getElementById(e)}
-onload = function() {
-function main(POX) {
-let src = "sample/R0010392.JPG"
-let mode = 1
-let angh = 40
-let mzz=0.6
-console.log(POX.param.query)
-if(POX.param.query[0]) {
-	src = POX.param.query[0] ;
-	mode = 0 
-	if(POX.param.query[1]) mode = POX.param.query[1] ;
-	if(mode==3 && POX.param.query[2]) angh = POX.param.query[2] ;
-}
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+        />
+        <title>PolygonExplorerPlayer</title>
+        <script src="js/poxp_all.js?20200607" defer></script>
+        <script src="js/poxp_view.js?20200607"></script>
+        <script>
+            function $(e) {
+                return document.getElementById(e);
+            }
+            onload = function () {
+                function main(POX) {
+                    let src = "sample/R0010392.JPG";
+                    let mode = 1;
+                    let angh = 40;
+                    let mzz = 0.6;
+                    console.log(POX.param.query);
+                    if (POX.param.query[0]) {
+                        src = POX.param.query[0];
+                        mode = 0;
+                        if (POX.param.query[1]) mode = POX.param.query[1];
+                        if (mode == 3 && POX.param.query[2])
+                            angh = POX.param.query[2];
+                    }
 
-//settings
-POX.setting={
-	name:"pano_view_vr2",
-	scale:1.0,
-	pixRatio:1.2,
-	gyro:true,
-	highRefreshRate:true,
-	foveationLevel:1,
-	cam:{
-	camMode:"vr",
-	gPad:true,
-	camAngle:90,
-	camCX:0,
-	camCY:0,
-	camCZ:0,
-	camRX:0,
-	camRZ:0,
-	camRY:-90,
-	camFar:2000,
-	camNear:0.01}
-};
-// light params
-const lvec = [
-		[0,5,1],
-		[0,-1,0]
-	]
-const lcol = [
-		[1,1,1],
-		[0.5,0.5,1]
-	]
-const lparam = [
-		[1,0],
-		[0.5,0]
-	]
-//scenedatass
-	
-	const scene={
-		env:{clear_color:[0.0,0.0,0.0,1.0],cull:true},
-		vs_uni:{
-		    col:[0.5,0.5,1.0,1.0]
-		},
-		fs_uni:{
-			pamb:0.2,
-			pdiff:0.8,
-			pspec:0.,
-			pref:0.0,
-			dspec:60,
-			ambcolor:[0.,0.,0],
-			lvec:lvec,
-			lcol:lcol,
-			lparam:lparam,
-			colmode:0,
-			shmode:0,
-			bcolor:[0,0,0.2,1]
-		},
-		texture:[
-		],
-		model:[
-			{geo:new WWModel().primitive("plane",
-			{wx:40,wz:40}).objModel(),hide:mode!=5,
-			bm:new Mat4().translate(0,-2,0),
-			fs_uni:{colmode:3,bcolor:[0.1,0.1,0.1,1]}
-			},
-		]
-	}
-	POX.setScene(scene).then(()=>{
-		loadscreen()
-	})
+                    //settings
+                    POX.setting = {
+                        name: "pano_view_vr2",
+                        scale: 1.0,
+                        pixRatio: 1.2,
+                        gyro: true,
+                        highRefreshRate: true,
+                        foveationLevel: 1,
+                        cam: {
+                            camMode: "vr",
+                            gPad: true,
+                            camAngle: 90,
+                            camCX: 0,
+                            camCY: 0,
+                            camCZ: 0,
+                            camRX: 0,
+                            camRZ: 0,
+                            camRY: -90,
+                            camFar: 2000,
+                            camNear: 0.01,
+                        },
+                    };
+                    // light params
+                    const lvec = [
+                        [0, 5, 1],
+                        [0, -1, 0],
+                    ];
+                    const lcol = [
+                        [1, 1, 1],
+                        [0.5, 0.5, 1],
+                    ];
+                    const lparam = [
+                        [1, 0],
+                        [0.5, 0],
+                    ];
+                    //scenedatass
 
-function loadscreen() {
-	POX.loadImage(src).then(function(img) {
-		const sobj = {name:"screen",geo: new WWModel().primitive("sphere",{div:40,wx:20,wy:20,wz:20,ninv:true}).objModel(),
-			bm:new CanvasMatrix4().translate(0,0,0),
-			fs_uni:{colmode:10,shmode:1,tex1:0,tex2:1,mode:mode,
-				mode:mode,angh:angh,zc:[0.5,0.5],zr:0,zz:1-mzz}
-			}
-		POX.render.addModel(sobj)
-		const zobj = POX.render.getModelData("screen")
-		const can1 = document.createElement('canvas') ;
-		const can2 = document.createElement('canvas') ;
-		let cw = (POX.wwg.version==1)?4096:img.width/2 
-		let ch = (POX.wwg.version==1)?4096:img.height
-		let sw = img.width/2 
-		if(mode==5) {
-			cw = (POX.wwg.version==1)?4096:img.width
-			sw = img.width 
-		}
-		if(cw>4096) {
-			ch = ch * 4096/cw ;cw = 4096 ;
-		}
-		POX.log(cw+"*"+ch)
-		POX.log(sw+"*"+img.height)
-		can1.width = cw ;
-		can1.height = ch ;
-		let  ctx = can1.getContext("2d") ;
-		ctx.drawImage(img,0,0,sw,img.height,0,0,cw,ch) ;
-		can2.width = cw 
-		can2.height = ch 
-		ctx = can2.getContext("2d") 
-		ctx.drawImage(img,sw,0,sw,img.height,0,0,cw,ch) ;
-	
-		POX.render.addTex({canvas:can1,opt:{flevel:1,repeat:2,nomipmap:true,format:"rgb"}})
-		POX.render.addTex({canvas:can2,opt:{flevel:1,repeat:2,nomipmap:true,format:"rgb"}})
-	
-		zobj.fs_uni.asp = img.width/img.height
+                    const scene = {
+                        env: { clear_color: [0.0, 0.0, 0.0, 1.0], cull: true },
+                        vs_uni: {
+                            col: [0.5, 0.5, 1.0, 1.0],
+                        },
+                        fs_uni: {
+                            pamb: 0.2,
+                            pdiff: 0.8,
+                            pspec: 0,
+                            pref: 0.0,
+                            dspec: 60,
+                            ambcolor: [0, 0, 0],
+                            lvec: lvec,
+                            lcol: lcol,
+                            lparam: lparam,
+                            colmode: 0,
+                            shmode: 0,
+                            bcolor: [0, 0, 0.2, 1],
+                        },
+                        texture: [],
+                        model: [
+                            {
+                                geo: new WWModel()
+                                    .primitive("plane", { wx: 40, wz: 40 })
+                                    .objModel(),
+                                hide: mode != 5,
+                                bm: new Mat4().translate(0, -2, 0),
+                                fs_uni: {
+                                    colmode: 3,
+                                    bcolor: [0.1, 0.1, 0.1, 1],
+                                },
+                            },
+                        ],
+                    };
+                    POX.setScene(scene).then(() => {
+                        loadscreen();
+                    });
 
-		POX.poxp.addEvent("frame",(ev)=>{
+                    function loadscreen() {
+                        POX.loadImage(src).then(function (img) {
+                            const sobj = {
+                                name: "screen",
+                                geo: new WWModel()
+                                    .primitive("sphere", {
+                                        div: 40,
+                                        wx: 20,
+                                        wy: 20,
+                                        wz: 20,
+                                        ninv: true,
+                                    })
+                                    .objModel(),
+                                bm: new CanvasMatrix4().translate(0, 0, 0),
+                                fs_uni: {
+                                    colmode: 10,
+                                    shmode: 1,
+                                    tex1: 0,
+                                    tex2: 1,
+                                    mode: mode,
+                                    mode: mode,
+                                    angh: angh,
+                                    zc: [0.5, 0.5],
+                                    zr: 0,
+                                    zz: 1 - mzz,
+                                },
+                            };
+                            POX.render.addModel(sobj);
+                            const zobj = POX.render.getModelData("screen");
+                            const can1 = document.createElement("canvas");
+                            const can2 = document.createElement("canvas");
+                            let cw =
+                                POX.wwg.version == 1 ? 4096 : img.width / 2;
+                            let ch = POX.wwg.version == 1 ? 4096 : img.height;
+                            let sw = img.width / 2;
+                            if (mode == 5) {
+                                cw = POX.wwg.version == 1 ? 4096 : img.width;
+                                sw = img.width;
+                            }
+                            if (cw > 4096) {
+                                ch = (ch * 4096) / cw;
+                                cw = 4096;
+                            }
+                            POX.log(cw + "*" + ch);
+                            POX.log(sw + "*" + img.height);
+                            can1.width = cw;
+                            can1.height = ch;
+                            let ctx = can1.getContext("2d");
+                            ctx.drawImage(
+                                img,
+                                0,
+                                0,
+                                sw,
+                                img.height,
+                                0,
+                                0,
+                                cw,
+                                ch
+                            );
+                            can2.width = cw;
+                            can2.height = ch;
+                            ctx = can2.getContext("2d");
+                            ctx.drawImage(
+                                img,
+                                sw,
+                                0,
+                                sw,
+                                img.height,
+                                0,
+                                0,
+                                cw,
+                                ch
+                            );
 
-			let hv = ev.cam.headVec
-			let px = 0.25-Math.atan2(hv[0],hv[2])/Math.PI/2 ;
-			if(px>1) px = px-1 
-			if(px<0) px = px+1
-			let py = Math.acos(hv[1])/Math.PI
-			zobj.fs_uni.zc = [px,py]
-			if(ev.rightPad) {
-				if(ev.rightPad.buttons[0].pressed) {
-					zobj.fs_uni.zz = 1 - ev.rightPad.buttons[0].value * mzz
-					zobj.fs_uni.zr = 0.2
-				} else zobj.fs_uni.zr = 0 
-			}
-		})	
-	})
-}
+                            POX.render.addTex({
+                                canvas: can1,
+                                opt: {
+                                    flevel: 1,
+                                    repeat: 2,
+                                    nomipmap: true,
+                                    format: "rgb",
+                                },
+                            });
+                            POX.render.addTex({
+                                canvas: can2,
+                                opt: {
+                                    flevel: 1,
+                                    repeat: 2,
+                                    nomipmap: true,
+                                    format: "rgb",
+                                },
+                            });
 
+                            zobj.fs_uni.asp = img.width / img.height;
 
-POX.event = function(ev,d) {
-	if(ev=="vrchange") {
-		POX.log("vr "+d)
-		if(d==1) {
-			POX.cam.camRX = 0 
-		}
-	}
-	if(ev=="gpad") {
-//		console.log(d.dpad)
-		if(d.dpad[0]>0 && d.axes[0]!=0) {
-			POX.cam.camRY += 30*(d.axes[0]>0?1:-1)
-		}
-		if(d.dpad[2]>0 && d.axes[2]!=0) {
-			POX.cam.camRY += 30*(d.axes[2]>0?1:-1)
-		}
-		if(d.dbtn[5]>0) POX.poxp.exitVR()
-		let zobj = POX.poxp.render.getModelData("screen")
-		let hv = POX.cam.headVec
-//		zobj.fs_uni.zr = d.buttons[0].pressed?0.2:0
+                            POX.poxp.addEvent("frame", (ev) => {
+                                let hv = ev.cam.headVec;
+                                let px =
+                                    0.25 -
+                                    Math.atan2(hv[0], hv[2]) / Math.PI / 2;
+                                if (px > 1) px = px - 1;
+                                if (px < 0) px = px + 1;
+                                let py = Math.acos(hv[1]) / Math.PI;
+                                zobj.fs_uni.zc = [px, py];
+                                if (ev.rightPad) {
+                                    if (ev.rightPad.buttons[0].pressed) {
+                                        zobj.fs_uni.zz =
+                                            1 -
+                                            ev.rightPad.buttons[0].value * mzz;
+                                        zobj.fs_uni.zr = 0.2;
+                                    } else zobj.fs_uni.zr = 0;
+                                }
+                            });
+                        });
+                    }
 
-	}
-	return true 
-}
+                    POX.event = function (ev, d) {
+                        if (ev == "vrchange") {
+                            POX.log("vr " + d);
+                            if (d == 1) {
+                                POX.cam.camRX = 0;
+                            }
+                        }
+                        if (ev == "gpad") {
+                            //		console.log(d.dpad)
+                            if (d.dpad[0] > 0 && d.axes[0] != 0) {
+                                POX.cam.camRY += 30 * (d.axes[0] > 0 ? 1 : -1);
+                            }
+                            if (d.dpad[2] > 0 && d.axes[2] != 0) {
+                                POX.cam.camRY += 30 * (d.axes[2] > 0 ? 1 : -1);
+                            }
+                            if (d.dbtn[5] > 0) POX.poxp.exitVR();
+                            let zobj = POX.poxp.render.getModelData("screen");
+                            let hv = POX.cam.headVec;
+                            //		zobj.fs_uni.zr = d.buttons[0].pressed?0.2:0
+                        }
+                        return true;
+                    };
 
-//sceneupdate
-POX.update=function(render,cam,time){
-	const ret={};
+                    //sceneupdate
+                    POX.update = function (render, cam, time) {
+                        const ret = {};
 
-	return ret;
-}	
-}
-const vshader = `attribute vec3 position;
+                        return ret;
+                    };
+                }
+                const vshader = `attribute vec3 position;
 attribute vec3 norm;
 attribute vec2 uv ;
 
@@ -202,8 +273,8 @@ void main() {
 	tnorm = (invMatrix * vec4(norm,0.0)).xyz ;
 	gl_Position = mvpMatrix * vec4(position, 1.0) ;
 }
-`
-const fshader = `precision highp float;
+`;
+                const fshader = `precision highp float;
 const int lnum = 2 ;
 
 uniform int colmode ;	//0:basecolor 1:vertex color  2:texture 3:checker 4:sky
@@ -369,134 +440,137 @@ void main() {
 
 	gl_FragColor = vec4((shmode!=1)?shade(col,norm):col,color.a);
 }
-`
-	POXP.init(()=>{
-		$("loading").style.display = "none" ;		
-	}, {m:main,vs:vshader,fs:fshader})
-}
-</script>
-<style>
-body,html {
-	margin:0 ;
-	width:100% ;
-	height:100% ;
-}
-body {
-	box-sizing: border-box ;
-	font-family:sans-serif ;
-	background-color:black;
-}
-canvas {
-	width:100% ;
-	height:100% ;
-}
-#cc {
-	position:absolute ;
-	width:17rem ;
-	top:0;
-	left:0;
-	color:#eee ;
-	background-color:#222 ;
-	opacity:0.4 ;
-}
-#pui input[type=range] {
-	width:10rem ;
-}
-#pui div.t {
-	float:left;
-	width:3rem ;
-	padding-left:0.2rem ;
-	overflow:hidden ;
-}
-#loading {
-	position:absolute ;
-	top:0;
-	left:0;
-	width:100% ;
-	height:100% ;	
-}
-#loading img {
-	margin-top:calc(50vh - 33px) ;
-	margin-left:calc(50vw  - 33px);
-}
-#footer {
-	position:absolute ;
-	top:calc(100% - 2rem) ;
-	color:#888 ;
-}
-#footer a {
-	color:#888 ;	
-}
-/* swicth (single checkbox) */
-.oswitch input {
-	display:none ;
-}
-.oswitch .sbtn {
-	font-family:"apple color emoji",sans-serif;
-}
-.oswitch input[type=checkbox] + .sbtn:before {
-	content: "⏸" 
-}
-.oswitch input[type=checkbox]:checked + .sbtn:before {
-	content: "▶️" ;
-}
-#bc {
-	position:absolute ;
-	height:20vw ;
-	bottom:1rem;
-	left:0;
-	color:#eee ;
-	background-color:#222 ;
-	opacity:0.4 ;
-	font-size:5vw ;	
-	user-select: none;
-	-webkit-user-select: none;
-}
-#bc button {
-	font-size:2vw ;
-}
-div.pad {
-	position:absolute ;
-	height:9.7rem ;
-	bottom:0rem;
-	color:#eee ;
-	background-color:#222 ;
-	opacity:0.6 ;
-	vertical-align:baseline;
-	font-size:10px ;	
-	user-select: none;
-	-webkit-user-select: none;
-}
-#padl {
-	left:0;	
-}
-#padr {
-	right:0;
-}
-div.pad button {
-	background-color:#aaa ;
-}
-div.pad button:hover {
-	background-color:#fff ;
-}
-#vrbtn {
-	position:absolute ;
-	width:50px ;
-	height:50px ;
-	top:0;
-	left:calc( 100% - 50px ) ;
-	opacity: 0.8 ;
-	background-color:#ccc;
-	background-position: center;
-	background-image:url("img/goggle.png") ;
-	background-repeat:no-repeat;
-}
-</style>
-</head>
-<body>
-<div id=loading><img src="img/guruguru.gif"></div>
-<div id=vrbtn></div>
-<canvas id="screen1"></canvas>
-<div id=footer><a href="https://github.com/wakufactory/vr360/" target="_blank">vr360 viewer</a></div>
-</body>
+`;
+                POXP.init(
+                    () => {
+                        $("loading").style.display = "none";
+                    },
+                    { m: main, vs: vshader, fs: fshader }
+                );
+            };
+        </script>
+        <style>
+            body,
+            html {
+                margin: 0;
+                width: 100%;
+                height: 100%;
+            }
+            body {
+                box-sizing: border-box;
+                font-family: sans-serif;
+                background-color: black;
+            }
+            canvas {
+                width: 100%;
+                height: 100%;
+            }
+            #cc {
+                position: absolute;
+                width: 17rem;
+                top: 0;
+                left: 0;
+                color: #eee;
+                background-color: #222;
+                opacity: 0.4;
+            }
+            #pui input[type="range"] {
+                width: 10rem;
+            }
+            #pui div.t {
+                float: left;
+                width: 3rem;
+                padding-left: 0.2rem;
+                overflow: hidden;
+            }
+            #loading {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+            #loading img {
+                margin-top: calc(50vh - 33px);
+                margin-left: calc(50vw - 33px);
+            }
+            #footer {
+                position: absolute;
+                top: calc(100% - 2rem);
+                color: #888;
+            }
+            #footer a {
+                color: #888;
+            }
+            /* swicth (single checkbox) */
+            .oswitch input {
+                display: none;
+            }
+            .oswitch .sbtn {
+                font-family: "apple color emoji", sans-serif;
+            }
+            .oswitch input[type="checkbox"] + .sbtn:before {
+                content: "⏸";
+            }
+            .oswitch input[type="checkbox"]:checked + .sbtn:before {
+                content: "▶️";
+            }
+            #bc {
+                position: absolute;
+                height: 20vw;
+                bottom: 1rem;
+                left: 0;
+                color: #eee;
+                background-color: #222;
+                opacity: 0.4;
+                font-size: 5vw;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+            #bc button {
+                font-size: 2vw;
+            }
+            div.pad {
+                position: absolute;
+                height: 9.7rem;
+                bottom: 0rem;
+                color: #eee;
+                background-color: #222;
+                opacity: 0.6;
+                vertical-align: baseline;
+                font-size: 10px;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+            #padl {
+                left: 0;
+            }
+            #padr {
+                right: 0;
+            }
+            div.pad button {
+                background-color: #aaa;
+            }
+            div.pad button:hover {
+                background-color: #fff;
+            }
+            #vrbtn {
+                position: absolute;
+                width: 50px;
+                height: 50px;
+                top: 0;
+                left: calc(100% - 50px);
+                opacity: 0.8;
+                background-color: #ccc;
+                background-position: center;
+                background-image: url("img/goggle.png");
+                background-repeat: no-repeat;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="loading"><img src="img/guruguru.gif" /></div>
+        <div id="vrbtn"></div>
+        <canvas id="screen1"></canvas>
+    </body>
 </html>
