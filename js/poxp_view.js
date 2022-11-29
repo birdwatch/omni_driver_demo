@@ -64,7 +64,7 @@ POXP.init = function (cb, src = null, query = null) {
             $("padr").style.opacity = d ? 0 : 0.4;
             window.scrollTo(0, 1000);
         });
-        poxp.enterVR();
+        //poxp.enterVR();
     });
     $("screen1").addEventListener("mousedown", (ev) => {
         poxp.keyElelment.focus();
