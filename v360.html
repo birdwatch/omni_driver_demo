@@ -24,6 +24,17 @@
                 ) {
                     DeviceOrientationEvent.requestPermission();
                 }
+                window.addEventListener("deviceorientation", function (ev) {
+                    var or = window.orientation;
+                    var d = or == 90 || or == -90;
+                    poxp.param.isStereo = d;
+                    $("cc").style.opacity = d ? 0 : 0.4;
+                    $("footer").style.display = d ? "none" : "block";
+                    $("vrbtn").style.display = d ? "none" : "block";
+                    $("padl").style.opacity = d ? 0 : 0.4;
+                    $("padr").style.opacity = d ? 0 : 0.4;
+                    window.scrollTo(0, 1000);
+                });
                 function main(POX) {
                     let src = "sample/R0010392.JPG";
                     let mode = 1;
