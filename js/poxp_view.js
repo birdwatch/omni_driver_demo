@@ -53,7 +53,7 @@ POXP.init = function (cb, src = null, query = null) {
         ) {
             DeviceOrientationEvent.requestPermission();
         }
-        window.addEventListener("deviceorientation", function (ev) {
+        /* window.addEventListener("deviceorientation", function (ev) {
             var or = window.orientation;
             var d = or == 90 || or == -90;
             poxp.param.isStereo = d;
@@ -63,7 +63,7 @@ POXP.init = function (cb, src = null, query = null) {
             $("padl").style.opacity = d ? 0 : 0.4;
             $("padr").style.opacity = d ? 0 : 0.4;
             window.scrollTo(0, 1000);
-        });
+        }); */
         //poxp.enterVR();
     });
     $("screen1").addEventListener("mousedown", (ev) => {
